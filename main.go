@@ -2,36 +2,20 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"log"
-	"net"
 	"net/http"
-	"os"
 )
 
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "hello world")
+}
+
 func main() {
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Hello, playground")
-	})
-
-	log.Println("Starting server...")
-	l, err := net.Listen("tcp", "localhost:8080")
+	http.HandleFunc("/", helloHandler)
+	port := "8080"
+	fmt.Println("Server started at http://localhost:" + port)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
-		log.Fatal(err)
-	}
-	go func() {
-		log.Fatal(http.Serve(l, nil))
-	}()
-
-	log.Println("Sending request...")
-	res, err := http.Get("http://localhost:8080/hello")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Reading response...")
-	if _, err := io.Copy(os.Stdout, res.Body); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
